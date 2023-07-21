@@ -1,0 +1,29 @@
+/*
+        (Mês Selecionado vs Mês Anterior) Total de IRS Retido 
+*/
+
+
+declare @mmmes as int 
+declare @mmano as int 
+declare @mmesanterior as int 
+declare @manoanterior as int 
+set @mmmes = #1#
+set @mmano = #2#
+set @mmesanterior = @mmmes - 1
+IF @mmesanterior = 0   
+BEGIN
+    set @mmesanterior=12
+	set @manoanterior = @mmano - 1
+END
+ELSE
+BEGIN
+	set @manoanterior = @mmano
+END
+select 
+month(data) as mes, sum(prde.ede)
+from pr (nolock) 
+inner join prde (nolock) on prde.prstamp=pr.prstamp 
+inner join cm6 on cm6.cm = prde.cd
+where ((month(pr.data) = @mmmes and year(pr.data) = @mmano) or (month(pr.data) = @mmesanterior and year(pr.data) = @manoanterior))
+and cm6.codirs=1
+group by month(data)
