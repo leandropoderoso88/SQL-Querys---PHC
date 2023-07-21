@@ -1,0 +1,15 @@
+/*
+    Tabela ST.
+    Verificar e imprime última data de movimento dos artigos presentes em stock.
+*/
+
+select  DISTINCT st.ref,
+         st.design,
+         st.stock,
+         st.usaid as 'Última data de movimento' 
+    from st(nolock) 
+        left join sl on sl.ref=st.ref
+WHERE sl.DATALC  IS NULL OR 
+    sl.datalc NOT BETWEEN #1# AND #2#
+    and  (year(getdate())-5) =   #1# 
+    and  (year(getdate())-10) =   #2# 
