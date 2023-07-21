@@ -1,0 +1,17 @@
+
+/*
+       Encomendas de cliente por fornecer com + 12 meses
+*/
+
+
+select bo.bostamp as 'STAMP',
+         bo.fechada,
+         convert(varchar,bo.obrano) as Numero,
+         bo.dataobra as 'Data de abertura do Dossier',
+          bo.nmdos as 'Dossier',
+          bo.nome as 'Nome' 
+          
+from dbo.bo (nolock)
+where  bo.ndos = 1 
+        and bo.fechada = 0 and DATEDIFF(DAY,bo.dataobra, GETDATE()) >= 365 
+        order by bo.dataobra desc
