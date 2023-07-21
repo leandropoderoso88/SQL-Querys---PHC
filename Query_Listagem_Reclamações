@@ -1,0 +1,31 @@
+
+/*
+       Listagem de Reclamações
+*/
+
+
+
+select bo.bostamp as stamp
+        , bo.obrano as 'Nº Dossier'
+        , convert(date,bo.dataobra) as data
+        ,bo.nome as Entidade
+        ,u_PPServ as Origem
+        --, TRAB3 as Categoria
+        --, bo2.PTCMDESC as Origem
+        , u_CPorRcl as Departamento
+        , u_RDCausa as 'Resp. Tratamento'
+        --, bo3.u_valornc as 'Outros Custos'
+        --, TRAB5 as 'Resp. Causas'
+        ,bo3.u_descrecl as Descricao
+        , bo3.u_RPTrata as 'Resp. Defi. Causa'
+        --,bo3.u_obstab4 as Seguimento
+        , bo3.u_conclu as Conclusao
+        ,u_VERIENC as 'Verificação e Encerramento'
+        ,u_ObsRecl as 'Observações'
+        , datediff(day,bo.dataobra,iif(year(bo.datafecho)=1900,getdate(),convert(date,bo.datafecho))) as dias
+        , bo.fechada
+from bo(nolock)
+        inner join bo2 on bo2.bo2stamp=bo.bostamp
+        inner join bo3 on bo3.bo3stamp=bo.bostamp
+where bo.ndos=60
+        and convert(date,bo.dataobra) between  '#1#' and '#2#'
