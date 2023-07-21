@@ -1,0 +1,15 @@
+
+/*
+       Tempo Médio colocação de encomenda até entrada em stock
+*/
+
+
+select bo.dataobra as 'Receção',
+        rembo.dataobra as 'Pedido de Encomenda',
+        DATEDIFF(day,rembo.dataobra, bo.dataobra) as 'Tempo(Dias)'
+from dbo.bo (nolock) 
+        inner join bi (nolock) on bi.bostamp=bo.bostamp
+        inner join bi rem (nolock) on rem.bistamp=bi.oobistamp
+        inner join bo rembo (nolock) on rem.bostamp=rembo.bostamp
+where bo.ndos=8 and rembo.ndos=16 
+order by [Receção] desc, [Pedido de Encomenda] desc
