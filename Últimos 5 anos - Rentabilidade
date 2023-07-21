@@ -1,0 +1,51 @@
+/* 
+    Esta solução foi criado pelo cacto do cliente precisar visualizarosúltimos 5 anos. 
+    Então temos a solução: 
+        valor total sem IVA;
+        valor de rentabilidade;
+    Classificados por Ano e separados por Mês.
+
+*/
+
+ WITH anos as (
+				SELECT YEAR(GETDATE()) ano
+	UNION ALL	SELECT YEAR(GETDATE())-1
+	UNION ALL	SELECT YEAR(GETDATE())-2
+	UNION ALL	SELECT YEAR(GETDATE())-3
+	UNION ALL	SELECT YEAR(GETDATE())-4
+ ), dados as (
+ Select SUM(etotal - eivav2) AS total,SUM(ettiliq - ecusto) AS Rentabilidade, SUM(ft.ettiva) AS ttiva,SUM(ft.ecusto) AS custo,ano= CAST(Year(ft.fdata) as CHAR(4)),mes=MONTH(ft.fdata) 
+  FROM ft (NOLOCK) inner join td (nolock) on ft.ndoc=td.ndoc and td.regrd=0 
+  WHERE ft.anulado = 0  And ft.estab=0 and ft.no = 4739
+
+  GROUP BY Year(ft.fdata),MONTH(ft.fdata)
+)
+
+select 
+'Ano' = anos.ano,
+'jan' = ISNULL((SELECT dados.total FROM dados WHERE dados.ano = anos.ano AND dados.mes=1), 0),
+'Rent Jan' = ISNULL((SELECT dados.rentabilidade FROM dados WHERE dados.ano = anos.ano AND dados.mes=1), 0),
+'fevereiro' = ISNULL((SELECT dados.total FROM dados WHERE dados.ano = anos.ano AND dados.mes=2), 0),
+'Rent Fev' = ISNULL((SELECT dados.rentabilidade FROM dados WHERE dados.ano = anos.ano AND dados.mes=2), 0),
+'março' = ISNULL((SELECT dados.total FROM dados WHERE dados.ano = anos.ano AND dados.mes=3), 0),
+'Rent Mar' = ISNULL((SELECT dados.rentabilidade FROM dados WHERE dados.ano = anos.ano AND dados.mes=3), 0),
+'abril' = ISNULL((SELECT dados.total FROM dados WHERE dados.ano = anos.ano AND dados.mes=4), 0),
+'Rent Abr' = ISNULL((SELECT dados.rentabilidade FROM dados WHERE dados.ano = anos.ano AND dados.mes=4), 0),
+'maio' = ISNULL((SELECT dados.total FROM dados WHERE dados.ano = anos.ano AND dados.mes=5), 0),
+'Rent Mai' = ISNULL((SELECT dados.rentabilidade FROM dados WHERE dados.ano = anos.ano AND dados.mes=5), 0),
+'junho' = ISNULL((SELECT dados.total FROM dados WHERE dados.ano = anos.ano AND dados.mes=6), 0),
+'Rent Jun' = ISNULL((SELECT dados.rentabilidade FROM dados WHERE dados.ano = anos.ano AND dados.mes=6), 0),
+'julho' = ISNULL((SELECT dados.total FROM dados WHERE dados.ano = anos.ano AND dados.mes=7), 0),
+'Rent Jul' = ISNULL((SELECT dados.rentabilidade FROM dados WHERE dados.ano = anos.ano AND dados.mes=7), 0),
+'agosto' = ISNULL((SELECT dados.total FROM dados WHERE dados.ano = anos.ano AND dados.mes=8), 0),
+'Rent Ago' = ISNULL((SELECT dados.rentabilidade FROM dados WHERE dados.ano = anos.ano AND dados.mes=8), 0),
+'setembro' = ISNULL((SELECT dados.total FROM dados WHERE dados.ano = anos.ano AND dados.mes=9), 0),
+'Rent Set' = ISNULL((SELECT dados.rentabilidade FROM dados WHERE dados.ano = anos.ano AND dados.mes=9), 0),
+'outubro' = ISNULL((SELECT dados.total FROM dados WHERE dados.ano = anos.ano AND dados.mes=10), 0),
+'Rent Out' = ISNULL((SELECT dados.rentabilidade FROM dados WHERE dados.ano = anos.ano AND dados.mes=10), 0),
+'novembro' = ISNULL((SELECT dados.total FROM dados WHERE dados.ano = anos.ano AND dados.mes=11), 0),
+'Rent Nov' = ISNULL((SELECT dados.rentabilidade FROM dados WHERE dados.ano = anos.ano AND dados.mes=11), 0),
+'dezembro' = ISNULL((SELECT dados.total FROM dados WHERE dados.ano = anos.ano AND dados.mes=12), 0),
+'Rent Dez' = ISNULL((SELECT dados.rentabilidade FROM dados WHERE dados.ano = anos.ano AND dados.mes=12), 0),
+'total' = ISNULL((SELECT SUM(dados.total) FROM dados WHERE dados.ano = anos.ano), 0)
+from anos
