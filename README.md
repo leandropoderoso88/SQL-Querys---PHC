@@ -1,2 +1,2 @@
 # SQL_Querys_PHC
-Exemplos de Querys realizadas com tabelas PHC Software
+Exemplos de Querys realizadas nas tabelas existentes, PHC Software
