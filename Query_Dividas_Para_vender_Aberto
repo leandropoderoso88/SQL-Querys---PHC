@@ -1,3 +1,7 @@
+/*
+         Documentos de Faturação.
+*/
+
 select   ft.nmdoc,
          ft.nome as 'Cliente',
          ft.pdata as 'Data de Vencimento',
