@@ -1,0 +1,17 @@
+/*
+       Consignações por fechar, devolver ou faturar com mais de 30 dias
+*/
+
+select bo.bostamp as stamp,
+         bo.nmdos,
+         bo.obrano as Numero,
+         convert(date,dataobra) as data,
+         nome, 
+         datediff(day,convert(date,dataobra),convert(date,getdate())) as dias
+from bo (nolock)
+        inner join bo2 (nolock) on bo2.bo2stamp=bo.bostamp
+where bo.ndos=28
+    and bo2.anulado=0
+    and bo.fechada=0
+group by bo.bostamp, bo.nmdos, bo.obrano, convert(date,dataobra) , nome
+having datediff(day,convert(date,dataobra),convert(date,getdate())) >29
