@@ -1,0 +1,50 @@
+
+/*
+        Total de fornecedores
+*/
+
+
+select 
+	case 
+		when '#1#' = 'Zona' then 
+			fl.zona
+		when '#1#' = 'Tipo' then 
+			fl.tipo
+		when '#1#' = 'Classe' then 
+			fl.classe
+		when '#1#' = 'Região' then 
+			fl.znregiao
+		when '#1#' = 'País' then 
+		(
+			case 
+				when fl.pais = 1 then 'Nacional' 
+				when fl.pais = 2 then 'U.E.'
+				when fl.pais = 3 then 'Outros' 
+			end
+		)
+	end as '#1#',
+	isnull(sum(fl.esaldo),0)+isnull(sum(fl.esaldlet),0) as Saldo,
+	count (distinct fl.no) as N_fornecedores
+from fl(nolock) 
+where inactivo = 0
+group by 
+(
+	case 
+	when '#1#' = 'Zona' then 
+		fl.zona
+	when '#1#' = 'Tipo' then 
+		fl.tipo
+	when '#1#' = 'Classe' then 
+		fl.classe
+	when '#1#' = 'Região' then 
+		fl.znregiao
+	when '#1#' = 'País' then 
+	(
+		case 
+			when fl.pais = 1 then 'Nacional' 
+			when fl.pais = 2 then 'U.E.'
+			when fl.pais = 3 then 'Outros' 
+		end
+	)
+	end
+)
