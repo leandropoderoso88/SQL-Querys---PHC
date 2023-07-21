@@ -1,0 +1,31 @@
+
+
+/*
+      Resumo de artigos por fornecedor
+*/
+
+select st.ref as codigo
+        ,st.FORREF as 'Codigo Forn'
+        ,st .design as descricao
+        ,st. stock as Stock
+        ,st.EPCUSTO as 'P.Net'
+        ,st.QTTCLI as EncCli
+        ,st.QTTFOR as EncFor
+        ,st.stock-st.QTTCLI+st.QTTFOR as StockPrev
+        ,sum(case when sl.cm<50 then sl.qtt else 0 end) as Entrada
+        ,sum(case when sl.cm<50 then 0 else sl.qtt end) as Saida
+from st(nolock)
+        inner join sl (nolock) on st.ref=sl.ref
+where st.fornecedor like '#1#'
+        and st.inactivo=0
+        and sl.trfa=0
+        and sl.cm  in (5,14,77,79,97)
+        and sl.datalc between '#2#' and '#3#'
+group by st.ref 
+        ,st.epcusto
+        ,st .design 
+        ,st. stock 
+        ,st.QTTCLI 
+        ,st.FORREF
+        ,st.QTTFOR 
+        ,st.stock-st.QTTCLI+st.QTTFOR
