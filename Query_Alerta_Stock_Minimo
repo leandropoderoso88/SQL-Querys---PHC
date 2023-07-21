@@ -1,0 +1,22 @@
+
+
+/*
+      Alerta Stock Mínimo
+*/
+
+select ref as Referencia
+    , design as Designação
+    , Stock
+    , QTTCLI as 'Encomenda Cliente'
+    , QTTFOR as 'Encomenda Fornecedor'
+    , PTOENC as 'Ponto Encomenda'
+    , PENTREGA as 'Prazo Entrega'
+    , STMIN as 'Stock Mínimo'
+    ,iif(STMIN-(Stock+QTTFOR-QTTCLI) <0,0,STMIN-(Stock+QTTFOR-QTTCLI)) as encomendar
+    ,FORNECEDOR 
+from st(nolock)
+    where st.INACTIVO=0
+        and st.stns=0
+        and stock <= STMIN
+        and STMIN <>0
+order by STMIN-(Stock+QTTFOR-QTTCLI) desc
