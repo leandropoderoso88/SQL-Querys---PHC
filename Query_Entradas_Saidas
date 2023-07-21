@@ -1,0 +1,21 @@
+/*
+      Entradas e saídas - Colaboradores
+*/
+
+
+
+''  Dim dt As double = cdata.getumvalordouble("select aprvfe from pe (nolock) where no="&xcuser.userno())
+    Dim User as string =  xcuser.userpenome()
+    Dim sb as string = $"select 'Entrada' as Movimento, Nome, No, cinicio as Início_contrato, dataout as Data_saída, stadesc as Estado, tcontr as Tipo_de_contrato, 
+        renova+1 as [Nº de renovações do contrato]
+				from pe(nolock) 
+    where dataadm > dateadd(year,-1,getdate()) and supnomefe='{user}'
+union all
+    select 'Saída' as Movimento, Nome, No, cinicio as Início_contrato, dataout as Data_saída, stadesc as Estado, tcontr as Tipo_de_contrato,
+        renova+1 as [Nº de renovações do contrato]
+				from pe(nolock) 
+    where dataout between dateadd(year,-1,getdate()) and getdate() and supnomefe='{user}'
+					"
+ 
+  Dim ds as DataTable = cdata.getdatatable(sb)
+  return ds
