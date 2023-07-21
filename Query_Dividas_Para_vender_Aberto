@@ -1,0 +1,14 @@
+select   ft.nmdoc,
+         ft.nome as 'Cliente',
+         ft.pdata as 'Data de Vencimento',
+         cast(DATEDIFF(day, GETDATE(), ft.pdata) as varchar) as 'Dias para vencer',
+         abs((cc.ecred-cc.ecredf)-(cc.edeb-cc.edebf)) as 'Aberto' ,
+         ft.fno as 'Nº' from dbo.ft (nolock) 
+
+inner join dbo.cc (nolock) on ft.ftstamp = cc.ftstamp 
+where DATEDIFF(day, GETDATE(), ft.pdata) <= #1# and DATEDIFF(day, GETDATE(), ft.pdata) >=0 
+        and ft.ndoc = 1 
+        and ft.anulado = 0 
+group by ft.nmdoc, ft.nome, ft.pdata,cc.ecred,cc.ecredf,cc.edeb,cc.edebf,ft.fno 
+having abs((cc.ecred-cc.ecredf)-(cc.edeb-cc.edebf)) > 0 
+order by ft.pdata asc
