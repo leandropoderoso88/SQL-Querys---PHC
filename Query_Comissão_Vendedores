@@ -1,0 +1,148 @@
+/*
+       Comissões de Vendedores
+*/
+
+
+
+dim filt_vend as string="#1#"
+dim filt_dataini as string="#2#"
+dim filt_datafim as string="#3#"
+dim filtsql_vend as string=" and pn.pago=1 and pn.ETCUSTO<>0 "
+if not filt_vend="TODOS"
+    filtsql_vend=" and pn.vendnm='"+filt_vend+"'"
+end if
+dim sql_vend as string="select distinct(pn.vendnm),pn.vendedor from pn(nolock) inner join cl on cl.no=pn.no where cl.u_nocomiss=0 and pn.vendedor<>0"+filtsql_vend
+dim dt_vend as datatable= cdata.getdatatable(sql_vend)
+dim sql_cm3 as string=""
+dim dt_cm3 as datatable
+dim sql_pn as string=""
+dim dt_pn as datatable
+dim sql_final as new stringbuilder
+dim dt_final as datatable
+dim i as Integer =0
+if dt_vend.haverows
+    for each dtvendrows in dt_vend.rows
+        i+=1
+        sql_cm3="select * from cm3 where cm="+dtvendrows.item("vendedor").tostring
+        dt_cm3=cdata.getdatatable(sql_cm3)
+        dim u_margfim1 as double=0
+        dim u_margfim2 as double=0
+        dim u_margfim3 as double=0
+        dim u_margini1 as double=0
+        dim u_margini2 as double=0
+        dim u_margini3 as double=0
+        dim u_comiss1 as double=0
+        dim u_comiss2 as double=0
+        dim u_comiss3 as double=0
+        dim Total_vende as double=0
+        if dt_cm3.haverows
+            u_margfim1 =dt_cm3.rows(0).item("u_margfim1")
+            u_margfim2 =dt_cm3.rows(0).item("u_margfim2")
+            u_margfim3 =dt_cm3.rows(0).item("u_margfim3")
+            u_margini1 =dt_cm3.rows(0).item("u_margini1")
+            u_margini2 =dt_cm3.rows(0).item("u_margini2")
+            u_margini3 =dt_cm3.rows(0).item("u_margini3")
+            u_comiss1 =dt_cm3.rows(0).item("u_comiss1")
+            u_comiss2 =dt_cm3.rows(0).item("u_comiss2")
+            u_comiss3 =dt_cm3.rows(0).item("u_comiss3")
+        end if
+        'sql_pn="select * from pn(nolock) where pago=1 and etiliquido<>0 and vendedor="+dtvendrows.item("vendedor").tostring
+        sql_pn="select 
+        pn.ftstamp, 
+        pn.epcusto,
+        pn.etcusto,
+        pn.epv,
+        pn.etiliquido,
+        pn.fdata,
+        pn.pdata,
+        pn.fno,
+        pn.ref,
+        pn.qtt,
+        pn.nmdoc,
+        pn.no,
+        pn.nome,
+        cl.clstamp
+        from pn(nolock) inner join cl on cl.no=pn.no
+        where cl.u_nocomiss=0 and pn.pago=1 and pn.pdata between '"+filt_dataini.tostring+"' and '"+filt_datafim.tostring+"' and pn.etiliquido<>0 and pn.ETCUSTO<>0 and pn.vendedor="+dtvendrows.item("vendedor").tostring
+        dt_pn=cdata.getdatatable(sql_pn)
+        
+        dim j as Integer =0
+        for each dtpnrows in dt_pn.rows
+            j+=1
+            
+            dim margem as double=0
+            'dim margem_2 as double=0
+            dim margem_final_one as double=u_margfim1
+            dim margem_final_two as double=u_margfim2
+            dim margem_final_three as double=u_margfim3
+            dim comissao as double=0
+            dim valor_comissao as double=0
+            'margem_2=Math.Round((dtpnrows.item("etcusto")/dtpnrows.item("etiliquido"))*100, 2)
+            margem=Math.Round((dtpnrows.item("epv")-dtpnrows.item("epcusto"))/dtpnrows.item("epv")*100, 2)
+            if u_margfim1=0 or u_margfim1=100
+                margem_final_one=100
+            end if
+            if u_margfim2=0 or u_margfim2=100
+                margem_final_two=100
+            end if
+            if u_margfim3=0 or u_margfim3=100
+                margem_final_three=100
+            end if
+            if margem>=u_margini1 and margem<=margem_final_one 
+                comissao=u_comiss1
+            else if margem>=u_margini2 and margem<=margem_final_two 
+                comissao=u_comiss2
+            else if margem>=u_margini3 and margem<=margem_final_three 
+                comissao=u_comiss3
+            end if  
+            valor_comissao=(comissao*dtpnrows.item("etiliquido"))/100
+            sql_final.append("select 
+            '<a href=""../ven/cm3form.aspx?cm="+dtvendrows.item("vendedor").tostring+""" target=""_bank"">"+dtvendrows.item("vendnm")+"</a>' as 'Vendedor',
+            '"+replace(dtpnrows.item("pdata").tostring," 00:00:00","")+"' as 'Data Pagamento',
+            '"+replace(dtpnrows.item("fdata").tostring," 00:00:00","")+"' as 'Data Doc.',
+            '"+dtpnrows.item("nmdoc").tostring+"' as 'Tipo Doc.',
+            '<a href=""../neg/ftform.aspx?stamp="+xcfox.u_scrypt(dtpnrows.item("ftstamp"))+""" target=""_bank"">"+dtpnrows.item("fno").tostring+"</a>' as 'Nº Doc.',
+            '<a href=""../neg/clform.aspx?stamp="+xcfox.u_scrypt(dtpnrows.item("clstamp"))+""" target=""_bank"">"+dtpnrows.item("no").tostring()+" - "+dtpnrows.item("nome")+"</a>' as cliente,
+            '<a href=""../sto/stform.aspx?ref="+dtpnrows.item("ref")+""" target=""_bank"">"+dtpnrows.item("ref").tostring+"</a>' as 'Ref.',
+            "+dtpnrows.item("qtt").tostring+" as 'Qtt.',
+            "+dtpnrows.item("epv").tostring+" as '€ Unitário',
+            "+dtpnrows.item("etiliquido").tostring+" as '€ Total',
+            "+dtpnrows.item("epcusto").tostring+" as '€ Custo Unitário',
+            "+dtpnrows.item("etcusto").tostring+" as '€ Custo Total',
+            '"+margem.tostring+" %' as 'Margem',
+            '"+comissao.tostring+" %' as '% Comissão',
+            '"+valor_comissao.tostring("0.000")+" €' as '€ Valor Comissão' 
+            ")
+            if j<dt_pn.rows.count()
+                 sql_final.append(" union all ")
+            end if
+            Total_vende+=valor_comissao
+        next
+        if dt_pn.haverows
+            sql_final.append(" union all ")
+            sql_final.append("select 
+                '<p style=""font-weight: 700;font-size:20px;"">TOTAL "+dtvendrows.item("vendnm")+"</p>' as 'Vendedor',
+                '' as 'Data Pagamento',
+                '' as 'Data Doc.',
+                '' as 'Tipo Doc.',
+                '' as 'Nº Doc.',
+                '' as cliente,
+                '' as 'Ref.',
+                0 as 'Qtt.',
+                0 as '€ Unitário',
+                0 as '€ Total',
+                0 as '€ Custo Unitário',
+                0 as '€ Custo Total',
+                '' as 'Margem',
+                '' as '% Comissão',
+                '<p style=""font-weight: 700;font-size:20px;"">"+Total_vende.tostring("0.00")+" €</p>' as '€ Valor Comissão' 
+                ")
+            if i<dt_vend.rows.count()
+                 sql_final.append(" union all ")
+            end if
+        end if
+        
+    next
+end if
+dt_final = cdata.getdatatable(sql_final.tostring)
+return dt_final
