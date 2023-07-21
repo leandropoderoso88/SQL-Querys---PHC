@@ -1,0 +1,20 @@
+/*
+      Stock parado (3meses) sem promoções
+*/
+
+
+select st.ststamp as stamp
+        ,st.ref
+        ,st.design
+        ,st.fornecedor
+        ,st.faminome
+        ,st.stock
+from st (nolock)
+    where USAID<datediff(month,-3,getdate())
+        and st.stock>0
+        and st.ref not in
+(
+select refi 
+from sp (nolock)
+)
+order by st.faminome
