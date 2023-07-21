@@ -1,0 +1,18 @@
+/*
+       Stock parado (3meses) em promoções
+*/
+
+
+
+select st.ref,
+         st.design,
+         st.usaid,
+         st.stock
+from st (nolock)
+    where USAID<datediff(month,-3,getdate())
+        and st.stock>0
+        and st.ref in
+(
+select refi 
+from sp (nolock)
+)
