@@ -1,0 +1,13 @@
+
+/*
+      Ultimo artigo criado
+*/
+
+select top 100 ststamp as stamp,
+         ref asRef,
+         design as 'Designação',
+         ousrdata as Criado,
+         ousrhora as 'Hora' 
+    from st where stns=0 
+            and u_prod=0  
+        order by ousrdata desc, ousrhora desc
