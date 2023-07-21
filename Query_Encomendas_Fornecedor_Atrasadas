@@ -1,0 +1,29 @@
+/*
+       Encomendas FO atrasadas
+*/
+
+
+
+select bo.bostamp as stamp
+        , bo.nmdos +'\'+ convert(varchar,bo.obrano) as Enc, bo.dataobra as 'Data Enc'
+        ,bo.nome as Fornecedor, datediff(day,bi.atedata,getdate()) as 'Dias Atraso'
+        ,bi.ref as Referencia
+        , bi.design as Designação
+        , bi.qtt as 'Qtt Encomenda'
+        , bi.atedata as 'Data Prevista'
+        , st.Stock
+        , st.QTTCLI as 'Encomenda Cliente'
+        , PENTREGA as 'Prazo Entrega'
+        , STMIN as 'Stock Mínimo'
+from st(nolock)
+    inner join bi (nolock) on bi.ref=st.ref
+    inner join bo (nolock) on bo.bostamp=bi.bostamp
+where st.INACTIVO=0
+    and st.stns=0
+    and (bi.atedata)< getdate()
+    and bi.ndos=16
+    and bi.qtt>0
+    and bi.qtt>bi.qtt2
+    and year(bi.atedata) not like 1900
+    and (bi.fechada=0 or bo.fechada=0)
+order by bo.dataobra
