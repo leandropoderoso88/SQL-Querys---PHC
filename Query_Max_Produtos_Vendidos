@@ -1,0 +1,25 @@
+/*
+       Min / Max Produtos vendidos
+*/
+
+
+
+select ref, design, max(epv) as Max_venda
+, (select top 1 epcusto from pn as pn1 where pn1.ref=pn.ref and pn1.fdata between '#1#' and '#2#' order by epv desc) as Custo_venda_max
+, (max(epv)- (select top 1 epcusto from pn as pn1 where pn1.ref=pn.ref and pn1.fdata between '#1#' and '#2#' order by epv desc))/ max(epv)*100 as Margem_venda_max
+, (select top 1 nome from pn as pn1 where pn1.ref=pn.ref and pn1.fdata between '#1#' and '#2#' order by epv desc) as Cliente_max
+, (select top 1 fdata from pn as pn1 where pn1.ref=pn.ref and pn1.fdata between '#1#' and '#2#' order by epv desc) as Data_max
+, min(epv) as Min_venda
+, (select top 1 epcusto from pn as pn1 where pn1.ref=pn.ref and pn1.fdata between  '#1#' and '#2#' order by epv asc) as Custo_venda_min
+,(min(epv)- (select top 1 epcusto from pn as pn1 where pn1.ref=pn.ref and pn1.fdata between  '#1#' and '#2#' order by epv asc))/min(epv)*100 as Margem_venda_min
+, (select top 1 nome from pn as pn1 where pn1.ref=pn.ref and pn1.fdata between  '#1#' and '#2#' order by epv asc) as Cliente_min
+, (select top 1 fdata from pn as pn1 where pn1.ref=pn.ref and pn1.fdata between  '#1#' and '#2#' order by epv asc) as Data_min
+from pn(nolock)
+where 
+fdata between  '#1#' and '#2#'
+and ref<>'' 
+and epcusto<>0
+and pn.ref like iif(#3#='',pn.ref,'%'+#3#+'%')
+and pn.design like iif(#4#='',pn.design,'%'+#4#+'%')
+group by ref, design
+order by ref
